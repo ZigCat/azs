@@ -25,6 +25,10 @@ public class GasStationSerializer extends StdSerializer<GasStation> {
         super(src);
     }
 
+    public GasStationSerializer(){
+        super(GasStation.class);
+    }
+
     @Override
     public void serialize(GasStation gasStation, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();

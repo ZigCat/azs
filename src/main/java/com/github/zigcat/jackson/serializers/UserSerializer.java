@@ -25,6 +25,10 @@ public class UserSerializer extends StdSerializer<User> {
         super(src);
     }
 
+    public UserSerializer(){
+        super(User.class);
+    }
+
     @Override
     public void serialize(User user, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();

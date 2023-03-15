@@ -6,8 +6,8 @@ import com.github.zigcat.DatabaseConfiguration;
 import com.github.zigcat.exceptions.NoAccessException;
 import com.github.zigcat.ormlite.models.Role;
 import com.github.zigcat.ormlite.models.User;
+import com.github.zigcat.ormlite.parameters.Modelable;
 import com.github.zigcat.ormlite.services.Security;
-import com.github.zigcat.ormlite.services.Service;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.http.Context;
@@ -17,18 +17,16 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class Controller<T> {
+public class Controller<T extends Modelable> {
     private Class<T> valueClass;
     private Logger l;
     private Dao<T, Integer> dao;
-    private Service service;
 
     public Controller(){}
 
     public Controller(Class<T> valueClass){
         this.valueClass = valueClass;
         this.l = LoggerFactory.getLogger(Controller.class);
-        service = new Service();
         initDao(valueClass);
     }
 
@@ -38,12 +36,12 @@ public class Controller<T> {
         try {
             if(map.containsKey("id")){
                 l.info("getting by id");
-                ctx.result(om.writeValueAsString(service.getById(getDao(), Integer.parseInt(map.get("id").toString()))));
+                ctx.result(om.writeValueAsString(getDao().queryForId(Integer.parseInt(ctx.queryParam("id")))));
                 ctx.status(200);
                 l.info(Security.ok);
             } else {
                 l.info("getting all");
-                ctx.result(om.writeValueAsString(service.listAll(getDao())));
+                ctx.result(om.writeValueAsString(getDao().queryForAll()));
                 ctx.status(200);
                 l.info(Security.ok);
             }
@@ -98,10 +96,11 @@ public class Controller<T> {
         String password = ctx.basicAuthCredentials().getPassword();
         try {
             User user = Security.authorize(login, password);
+            T t = om.readValue(ctx.body(), getValueClass());
             if(user != null){
+                l.info(t.getId() + " " + user.getId());
                 if(user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.OWNER)){
-                    String body = ctx.body();
-                    getDao().update(om.readValue(body, getValueClass()));
+                    getDao().update(t);
                     ctx.status(200);
                     ctx.result(Security.ok);
                     l.info("INSTANCE OF "+getValueClass().getName()+" UPDATED");
@@ -133,17 +132,15 @@ public class Controller<T> {
         l.info("DELETING INSTANCE OF "+getValueClass().getName());
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
-        Map map = ctx.queryParamMap();
+        int id = Integer.parseInt(ctx.pathParam("id"));
         try {
             User user = Security.authorize(login, password);
             if(user != null){
                 if(user.getRole().equals(Role.ADMIN)){
-                    if(map.containsKey("id")){
-                        getDao().deleteById(Integer.parseInt(map.get("id").toString()));
-                        ctx.status(200);
-                        ctx.result(Security.ok);
-                        l.warn("INSTANCE OF "+getValueClass().getName()+" DELETED");
-                    }
+                    getDao().deleteById(id);
+                    ctx.status(200);
+                    ctx.result(Security.ok);
+                    l.warn("INSTANCE OF "+getValueClass().getName()+" DELETED");
                 } else {
                     throw new NoAccessException("You haven't permission for this action");
                 }

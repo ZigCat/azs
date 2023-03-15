@@ -25,6 +25,10 @@ public class CheckSerializer extends StdSerializer<Check> {
         super(src);
     }
 
+    public CheckSerializer(){
+        super(Check.class);
+    }
+
     @Override
     public void serialize(Check check, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();

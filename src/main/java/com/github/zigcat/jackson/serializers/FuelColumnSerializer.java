@@ -25,6 +25,10 @@ public class FuelColumnSerializer extends StdSerializer<FuelColumn> {
         super(src);
     }
 
+    public FuelColumnSerializer(){
+        super(FuelColumn.class);
+    }
+
     @Override
     public void serialize(FuelColumn fuelColumn, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();

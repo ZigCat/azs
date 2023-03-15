@@ -1,10 +1,12 @@
 package com.github.zigcat.ormlite.models;
 
+import com.github.zigcat.ormlite.controllers.Controller;
+import com.github.zigcat.ormlite.parameters.Modelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "fuel_column")
-public class FuelColumn {
+public class FuelColumn implements Modelable {
     @DatabaseField(generatedId = true)
     private int id;
 
@@ -13,6 +15,8 @@ public class FuelColumn {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Column column;
+
+    public static Controller<FuelColumn> controller = new Controller<>(FuelColumn.class);
 
     public FuelColumn() {
     }

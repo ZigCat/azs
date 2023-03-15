@@ -1,6 +1,6 @@
 package com.github.zigcat.exceptions;
 
-public class NoAccessException extends Exception {
+public class NoAccessException extends RuntimeException {
     public NoAccessException(String message){
         super(message);
     }

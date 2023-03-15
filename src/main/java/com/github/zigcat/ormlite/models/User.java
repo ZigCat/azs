@@ -1,13 +1,10 @@
 package com.github.zigcat.ormlite.models;
 
-import com.github.zigcat.DatabaseConfiguration;
+import com.github.zigcat.ormlite.controllers.CreatorController;
 import com.github.zigcat.ormlite.parameters.Modelable;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.sql.SQLException;
 
 @DatabaseTable(tableName = "user")
 public class User implements Modelable {
@@ -29,16 +26,7 @@ public class User implements Modelable {
     @DatabaseField
     private Role role;
 
-
-    public static Dao<User, Integer> userDao;
-
-    static {
-        try {
-            userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    public static CreatorController controller = new CreatorController();
 
     public User() {
     }

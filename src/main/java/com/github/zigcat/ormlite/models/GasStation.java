@@ -1,5 +1,6 @@
 package com.github.zigcat.ormlite.models;
 
+import com.github.zigcat.ormlite.controllers.Controller;
 import com.github.zigcat.ormlite.parameters.Modelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -14,6 +15,8 @@ public class GasStation implements Modelable {
 
     @DatabaseField
     private String address;
+
+    public static Controller<GasStation> controller = new Controller<>(GasStation.class);
 
     public GasStation() {
     }

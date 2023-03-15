@@ -1,5 +1,6 @@
 package com.github.zigcat.ormlite.models;
 
+import com.github.zigcat.ormlite.controllers.Controller;
 import com.github.zigcat.ormlite.parameters.Modelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -17,6 +18,8 @@ public class Fuel implements Modelable {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private GasStation gasStation;
+
+    public static Controller<Fuel> controller = new Controller<>(Fuel.class);
 
     public Fuel() {
     }

@@ -25,6 +25,10 @@ public class ColumnSerializer extends StdSerializer<Column> {
         super(src);
     }
 
+    public ColumnSerializer(){
+        super(Column.class);
+    }
+
     @Override
     public void serialize(Column column, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();

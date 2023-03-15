@@ -25,13 +25,20 @@ public class CreatorController extends Controller<User> {
         String password = ctx.basicAuthCredentials().getPassword();
         try {
             User user = Security.authorize(login, password);
+            User nUser = om.readValue(ctx.body(), User.class);
             if(user != null){
                 if(user.getRole().equals(Role.ADMIN)){
-                    getDao().create(om.readValue(ctx.body(), User.class));
+                    getDao().create(nUser);
                     ctx.result(Security.ok);
                     ctx.status(200);
                     l.info("USER CREATED WITH ADMIN ACCESS");
-
+                } else if(!user.getRole().equals(Role.ADMIN)
+                        && (!nUser.getRole().equals(Role.USER) || nUser.getRole() == null)) {
+                    nUser.setRole(Role.USER);
+                    getDao().create(nUser);
+                    ctx.result(Security.ok);
+                    ctx.status(200);
+                    l.info("USER CREATED WITH ADMIN ACCESS");
                 } else {
                     throw new NoAccessException("You haven't permission for this action");
                 }
@@ -54,6 +61,52 @@ public class CreatorController extends Controller<User> {
         } catch (NoAccessException e) {
             l.warn(Security.noPermission);
             ctx.result(Security.noPermission);
+            ctx.status(403);
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void update(Context ctx, ObjectMapper om){
+        l.info("UPDATING INSTANCE OF USER");
+        String login = ctx.basicAuthCredentials().getUsername();
+        String password = ctx.basicAuthCredentials().getPassword();
+        try {
+            User user = Security.authorize(login, password);
+            User nUser = om.readValue(ctx.body(), User.class);
+            if(user != null){
+                l.info(nUser.getId() + " " + user.getId());
+                if(user.getRole().equals(Role.ADMIN)){
+                    getDao().update(nUser);
+                    ctx.status(200);
+                    ctx.result(Security.ok);
+                    l.info("INSTANCE OF "+getValueClass().getName()+" UPDATED as ADMIN");
+                } else if(user.getId() == nUser.getId()
+                        && (user.getRole().equals(nUser.getRole()) || user.getRole() == null)){
+                    nUser.setRole(user.getRole());
+                    getDao().update(nUser);
+                    ctx.status(200);
+                    ctx.result(Security.ok);
+                    l.info("INSTANCE OF "+getValueClass().getName()+" UPDATED");
+                } else {
+                    throw new NoAccessException("You haven't permission for this action");
+                }
+            } else {
+                throw new NullPointerException("Unauthorized access restricted");
+            }
+        } catch (SQLException | JsonProcessingException e) {
+            l.warn(Security.serverErrorMessage);
+            ctx.result(Security.serverErrorMessage);
+            ctx.status(500);
+            e.printStackTrace();
+        } catch (NoAccessException e) {
+            l.warn(Security.noPermission);
+            ctx.result(Security.noPermission);
+            ctx.status(403);
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            l.warn(Security.unauthorized);
+            ctx.result(Security.unauthorized);
             ctx.status(403);
             e.printStackTrace();
         }

@@ -25,6 +25,10 @@ public class FuelSerializer extends StdSerializer<Fuel> {
         super(src);
     }
 
+    public FuelSerializer(){
+        super(Fuel.class);
+    }
+
     @Override
     public void serialize(Fuel fuel, JsonGenerator json, SerializerProvider serializerProvider) throws IOException {
         json.writeStartObject();
